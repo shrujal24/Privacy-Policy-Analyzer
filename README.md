@@ -1,77 +1,21 @@
-# privacy_policy_analyzer_6120
+background.js: Explanation: chrome.runtime.onMessage.addListener  An event listener for messages from other scripts in the extension. Useful for background communication between the popup script and the content script. request.action === "goToHomePage" Whether the action of the message is to open the Chrome home page. If it is, open a new browser tab with chrome.tabs.create. chrome.tabs.create({ url: "chrome://newtab" }): This is the API call that opens a new tab in Chrome and sets it to the "new tab" page. The background script ensures that some actions - such as opening the home page - are executed upon receiving messages from different parts of the extension.
 
-background.js:
-  Detailed Explanation:
-    chrome.runtime.onMessage.addListener: This function sets up an event listener that listens for messages sent from other scripts within the extension. It's useful for background communication between the popup script and the content script.
-    request.action === "goToHomePage": This condition checks if the action in the message is to open the Chrome homepage. If so, it creates a new browser tab with chrome.tabs.create.
-    chrome.tabs.create({ url: "chrome://newtab" }): This API call creates a new tab in the Chrome browser, directing it to the "new tab" page.
- Purpose: 
-    The background script ensures that specific actions (like opening the home page) are executed when messages are received from the extension's components.
+content.js: This script injects a modal on the webpage for analyzing the privacy policy.
 
-content.js: 
-This script is responsible for injecting and displaying a modal on the webpage to analyze the privacy policy.
+Detailed Explanation: sessionStorage: Check whether the modal has already appeared in this session and prevent further displays. overlay and modal are HTML elements dynamically created to show Privacy Analyzer UI. Some styles would keep the modal centered and polished-looking. createStarRating: A function creates the star icons to visually show up a rating for a given privacy policy. It applies a conditional logic to color the stars given a rating. analyzeButton: Clicked to extract the text of the webpage and send it to the backend, Flask, for analysis. fetch API: Used to send an HTTP POST request to the backend server running on localhost:8000; sends policy text and waits on a JSON response with the analysis. buttonContainer: Contains the navigation buttons, "Proceed to Website" and "Go to Chrome Home". The latter opens a new tab using the Chrome API. Purpose: This script injects a modal onto any webpage to analyze the privacy policy and display the results.
 
-  Detailed Explanation:
-    sessionStorage: Used to check if the modal has already been shown in the current session and to prevent it from showing again.
-    overlay and modal: These are HTML elements created dynamically to display the Privacy Analyzer UI. Styling ensures that the modal appears centered and looks polished.
-    createStarRating: This function generates star icons to visually represent the privacy policy rating. It uses conditional logic to color the stars based on the provided rating.
-    analyzeButton: When clicked, this button extracts the webpage text and sends it to the Flask backend for analysis.
-    fetch API: Used to send an HTTP POST request to the backend server running on localhost:8000. It sends the policy text and waits for a JSON response containing the analysis.
-    buttonContainer: Contains navigation buttons, such as "Proceed to Website" and "Go to Chrome Home". The latter uses the Chrome API to open a new tab.
-  Purpose:
-    This script injects a modal onto any webpage to analyze the privacy policy and display the results.
+main.py: This contains the backend part of your privacy policy analyzer, which is implemented using the Flask web framework. It receives HTTP requests from the extension and does some analysis on the privacy policy by using a large language model (LLM).
 
-main.py:
-This file is the backend component of your privacy policy analyzer, built using the Flask web framework. It handles HTTP requests from the extension and performs privacy policy analysis using a large language model (LLM).
+Detailed Explanation: Setting Up Flask: Instantiate a web server using the Flask framework to listen for HTTP POST requests on /analyze. CORS: the CORS package allows the Chrome extension-a different origin-to talk to the server. extract_json_from_text: utility function that uses regular expressions to extract JSON-like data from text. analyze_with_ollama: This runs the analysis using the Ollama language model, using subprocess.run to run the LLM and capture the output. This function formats the output of the LLM into structured JSON. subprocess: Allows Python to execute shell commands. Here it executes the LLaMA LLM and passes the given text of the privacy policy to it. Error Handling: If the LLM errors out or does not return JSON, an error is logged and returned to the front end. Purpose: This module acts like a bridge between the extension and the language model. It analyzes the privacy policy and returns ratings.
 
-  Detailed Explanation:
-    Flask Setup: The Flask framework is used to create a web server that listens for HTTP POST requests on /analyze.
-    CORS: The CORS package allows the Chrome extension (a different origin) to communicate with the Flask server.
-    extract_json_from_text: A utility function that uses regular expressions to extract JSON-like data from text.
-    analyze_with_ollama: Runs the analysis using the Ollama language model. It uses subprocess.run to execute the LLM and captures the output. The function formats the LLM's output into a structured JSON format.
-    subprocess: This module is used to run shell commands from Python. In this case, it runs the Ollama LLM and provides it with the privacy policy text.
-    Error Handling: If the LLM fails or does not return JSON, errors are logged and returned to the frontend.
-  Purpose: 
-    Acts as a bridge between the extension and the language model, analyzing privacy policies and returning ratings.
+manifest.json: This is the configuration and permission file for your Chrome extension.
 
-manifest.json:
-This file defines the configuration and permissions for your Chrome extension.
+Explanation in detail: manifest_version declares the version of the manifest format. Version 3 is the latest and introduces significant changes to permissions and background scripts. name, version, description: These are basic metadata about the extension. permissions: These declare what the extension can do. For example, activeTab: It provides active permission to the extension to act upon currently the active tab. webNavigation: Allows intercepting and modifying navigation events. scripting: Allows execution of scripts. tabs: To manage tabs. host_permissions: The permission states that the extension can run on all URLs. action: It's used to define the popup interface along with icons used in the extension. background: This defines background.js as a service worker for handling background tasks of the application. content_scripts: Specifies the scripts to be injected into web pages along with the conditions for their execution. icons: It specifies icons that will be used for the extension in different sizes. It contains basic information about the extension to Chrome, like permissions, declared content scripts, and background behavior. 
 
-  Detailed Explanation:
-    manifest_version: Specifies the version of the manifest format. Version 3 is the latest and introduces significant changes to permissions and background scripts.
-    name, version, description: Basic metadata for the extension.
-    permissions: These specify what the extension can do, such as:
-    activeTab: Allows the extension to interact with the currently active tab.
-    webNavigation: Used for intercepting and modifying navigation events.
-    scripting: Grants the ability to execute scripts.
-    tabs: Enables tab management.
-    host_permissions: Specifies that the extension has permission to run on all URLs.
-    action: Defines the popup interface and the icons used in the extension.
-    background: Specifies the service worker (background.js) that handles background tasks.
-    content_scripts: Lists the scripts that should be injected into webpages and the conditions under which they run.
-    icons: Specifies the icons used for the extension in different sizes.
-  Purpose:
-    Provides Chrome with essential information about the extension and specifies permissions, content scripts, and background behavior.
+popup.html: This defines the HTML structure and style for the popup that opens when the user interacts with the extension icon.
 
-popup.html:
-Defines the HTML structure and style for the popup that appears when the user interacts with the extension icon.
+Detailed Explanation: The HTML Structure This contains a title (h2), a content box div#content, an "Analyze" button, and a hidden button container with "Proceed to Page" and "Go to Chrome Home" buttons. CSS Styles: It defines the layout, color, shadow, and responsive behavior of elements. These styles further enhance the interface, neat, and polished. Script Link: Include the popup.js script that implements the interactivity for this popup. Purpose: This is a simplified user interface for the Chrome extension popup. The Chrome extension guides the user through the analysis of a privacy policy and continues with the results received from such an analysis.
 
-  Detailed Explanation:
-    HTML Structure: Contains a title (h2), a content box (div#content), an "Analyze" button, and a hidden button container with "Proceed to Page" and "Go to Chrome Home" buttons.
-    CSS Styles: Defines the layout, colors, shadows, and responsive behavior of elements. Styles enhance the user interface for a clean and polished appearance.
-    Script Link: The popup.js script is included to handle the interactivity of the popup.
-  Purpose:
-    Provides a simple, user-friendly interface for the Chrome extension popup, guiding users to analyze a privacy policy and proceed based on the results.
+popup.js: holds the logic and interactivity code of the extension's popup UI.
 
-popup.js
-This script handles the logic and interactivity of the extension’s popup interface.
-
-  Detailed Explanation:
-    DOMContentLoaded Event: Ensures that the script runs only after the HTML has fully loaded.
-    Event Listeners:
-    analyzeButton: Sends a POST request to the backend server with a sample privacy policy text. The server responds with a structured analysis, which is then formatted and displayed in the popup.
-    proceedButton: Closes the popup when clicked.
-    goHomeButton: Opens a new Chrome tab with the homepage and closes the popup.
-    fetch API: Used to make asynchronous requests to the Flask server and handle the response.
-  Purpose:
-    Handles user interactions in the popup, performs the privacy policy analysis by communicating with the backend, and displays the results or error messages.
+Detailed Explanation: The DOMContentLoaded Event: Ensuring that the script only runs once the DOM is fully loaded. Listening for Events: analyzeButton: Send a POST request to the backend with a sample text of a privacy policy. Server returns a structured analysis that gets formatted and displayed in the popup. proceedButton: The button which closes the popup when clicked. goHomeButton: Opens a new tab in Chrome with the homepage and closes the popup. fetch API: Used for making asynchronous requests to the Flask server, handling the response. Purpose: Deal with the user's interactions in the popup, make the privacy policy analysis using the backend, and display the results or error messages.
