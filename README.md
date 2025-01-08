@@ -4,7 +4,7 @@ Features: Analyze Privacy Policies: Extracts and evaluates the text of website p
 
 Technology Stack: Frontend:s HTML/CSS: For the popup UI and layout. JavaScript: For interactivity and dynamic rendering in popup.js and content.js. Backend: Flask: Handles requests and communicates with the language model for policy analysis. Python: Core backend logic.
 
-Installation: Clone the Repository: git clone https://github.com/your-repo/privacy-policy-analyzer.git
+Installation: Clone the Repository: git clone https://github.com/shrujal24/Privacy-Policy-Analyzer
 
 Set Up the Backend: Install Python dependencies: pip install flask flask-cors
 
